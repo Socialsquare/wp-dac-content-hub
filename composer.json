@@ -1,0 +1,18 @@
+{
+  "name": "danish-architecture-centre/dac-content-hub",
+  "version": "0.1",
+  "type": "wordpress-plugin",
+  "license": "MIT",
+  "description": "Connecting WordPress with a content hub",
+  "authors": [
+    {
+      "name": "Kraen Hansen",
+      "email": "kraen@socialsquare.dk"
+    }
+  ],
+  "require": {
+    "php": "^7.0",
+    "prismic/php-sdk": "3.*",
+    "composer/installers": "~1.0"
+  }
+}
