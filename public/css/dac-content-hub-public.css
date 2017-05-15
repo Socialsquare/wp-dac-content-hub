@@ -2,3 +2,33 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
+
+.dac-collage__item {
+	box-shadow: none !important; /* FIXME: Refactor this */
+	display: inline-block;
+	height: 150px;
+	position: relative;
+  background-position: center;
+  background-size: cover;
+  margin-bottom: -7px; /* FIXME: Refactor this */
+}
+
+.dac-collage__overlay {
+  align-items: center;
+  background: rgba(0, 0, 0, .4);
+  bottom: 0;
+  color: white;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  padding: 10%;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.75);
+  top: 0;
+}
+
+.dac-collage__overlay:hover {
+  background: rgba(0, 0, 0, .2);
+}

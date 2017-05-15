@@ -153,18 +153,23 @@ class Dac_Content_Hub_Public {
 		$resolver = $this->prismic->linkResolver;
 
 		if($type === 'case') {
+			$first_publication = $content->getFirstPublicationDate();
+			$last_publication = $content->getLastPublicationDate();
+			$short_description = $content->getStructuredText('case.short-description');
 			// The ID needs to be faked to trick get_metadata into returning metadata
 			return array(
 				'ID' => PHP_INT_MAX,
 				'post_type' => $type,
 				'post_title' => $content->getStructuredText('case.title')->asText(),
 				'post_name' => $content->getUID(),
-				'post_date' => $content->getFirstPublicationDate()->format('Y-m-d H:i:s'),
-				'post_modified' => $content->getLastPublicationDate()->format('Y-m-d H:i:s'),
-				'post_excerpt' => $content->getStructuredText('case.short-description')->asHtml($resolver),
+				'post_date' => $first_publication ? $first_publication->format('Y-m-d H:i:s') : null,
+				'post_modified' => $last_publication ? $last_publication->format('Y-m-d H:i:s') : null,
+				'post_excerpt' => $short_description ? $short_description->asHtml($resolver) : '',
 				'post_content' => $content->getStructuredText('case.description')->asHtml($resolver),
 				'content' => $content
 			);
+		} else {
+			throw new Error('Unexpected content-type: ' . $type);
 		}
 	}
 
@@ -188,6 +193,59 @@ class Dac_Content_Hub_Public {
 		} else {
 			return $html;
 		}
+	}
+
+	public static function clean_query_string($query_string) {
+		$query_string = str_replace('&#8220;', '"', $query_string);
+		$query_string = str_replace('&#8221;', '"', $query_string);
+		return trim(strip_tags($query_string));
+	}
+
+	public static function overlay_html($inside_html) {
+		return '<div class="dac-collage__overlay">' . $inside_html . '</div>';
+	}
+
+	public static function collage_item_from_content($content, $cols) {
+		$type = $content->getType();
+		if($type === 'case') {
+			$href = '/content/case/' . $content->getSlug();
+			$pictures = $content->getGroup('case.pictures')->getArray();
+			$first_picture = array_shift($pictures);
+			$background_url = $first_picture->getImage('picture')->getUrl();
+
+			$style = 'width:' . 100 / $cols . '%;';
+			$style .= 'background-image:url(' . $background_url . ');';
+
+			$inside_html = $content->getStructuredText('case.title')->asText();
+			$overlay_html = self::overlay_html($inside_html);
+
+			return '<a href="' . $href . '" style="' . $style . '" class="dac-collage__item">' . $overlay_html . '</a>';
+		} else {
+			throw new Error('Unexpected content-type: ' . $type);
+		}
+	}
+
+	public function add_shortcodes() {
+		add_shortcode('content-collage', array($this, 'content_collage_shortcode'));
+	}
+
+	public function content_collage_shortcode($atts = [], $content = null, $cols = 3) {
+		$atts = shortcode_atts(
+			array(
+				'cols' => 3
+			),
+			$atts,
+			'content-collage'
+		);
+
+		$api = $this->prismic->get_api();
+		$query_string = self::clean_query_string($content);
+		$response = $api->query($query_string);
+		$result = '';
+		foreach($response->getResults() as $doc) {
+			$result .= self::collage_item_from_content($doc, $atts['cols']);
+		}
+		return $result;
 	}
 
 }

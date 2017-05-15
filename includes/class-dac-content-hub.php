@@ -175,6 +175,8 @@ class Dac_Content_Hub {
 		$this->loader->add_filter( 'posts_pre_query', $plugin_public, 'posts_pre_query', 10, 2 );
 		$this->loader->add_filter( 'get_post_metadata', $plugin_public, 'get_post_metadata', 100, 4 );
 		$this->loader->add_filter( 'post_thumbnail_html', $plugin_public, 'post_thumbnail_html', 100, 5 );
+
+		$this->loader->add_action( 'init', $plugin_public, 'add_shortcodes' );
 	}
 
 	/**
