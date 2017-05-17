@@ -137,8 +137,6 @@ class Dac_Content_Hub_Public {
 		  $content = $api->getByUID($content_type, $content_uid);
 			$content_object = (object) $this->post_data_from_content($content);
 
-			var_dump(get_permalink($content_object));
-
 			$query->queried_object = $content_object;
 			$query->queried_object_id = $content->getUID();
 			// $query->is_page = true;
