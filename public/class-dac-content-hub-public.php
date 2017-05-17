@@ -208,7 +208,7 @@ class Dac_Content_Hub_Public {
 	public static function collage_item_from_content($content, $cols, $height) {
 		$type = $content->getType();
 		if($type === 'case') {
-			$href = '/content/case/' . $content->getSlug();
+			$href = home_url('/content/case/' . $content->getSlug());
 			$pictures = $content->getGroup('case.pictures')->getArray();
 			$first_picture = array_shift($pictures);
 			$background_url = $first_picture->getImage('picture')->getUrl();
