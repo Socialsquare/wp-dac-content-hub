@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       DAC Content Hub
  * Plugin URI:        http://www.dac.dk/content-hub
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Description:       Connecting WordPress with the DAC content hub
  * Version:           1.0.0
  * Author:            Kræn Hansen
  * Author URI:        http://socialsquare.dk
