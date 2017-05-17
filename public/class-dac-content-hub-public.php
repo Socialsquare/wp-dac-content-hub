@@ -205,7 +205,7 @@ class Dac_Content_Hub_Public {
 		return '<div class="dac-collage__overlay">' . $inside_html . '</div>';
 	}
 
-	public static function collage_item_from_content($content, $cols) {
+	public static function collage_item_from_content($content, $cols, $height) {
 		$type = $content->getType();
 		if($type === 'case') {
 			$href = '/content/case/' . $content->getSlug();
@@ -214,6 +214,7 @@ class Dac_Content_Hub_Public {
 			$background_url = $first_picture->getImage('picture')->getUrl();
 
 			$style = 'width:' . 100 / $cols . '%;';
+			$style .= 'height:' . $height . ';';
 			$style .= 'background-image:url(' . $background_url . ');';
 
 			$inside_html = $content->getStructuredText('case.title')->asText();
@@ -232,7 +233,9 @@ class Dac_Content_Hub_Public {
 	public function content_collage_shortcode($atts = [], $content = null, $cols = 3) {
 		$atts = shortcode_atts(
 			array(
-				'cols' => 3
+				'cols' => 3,
+				'item-height' => '150px',
+				'full-width' => false
 			),
 			$atts,
 			'content-collage'
@@ -243,7 +246,7 @@ class Dac_Content_Hub_Public {
 		$response = $api->query($query_string);
 		$result = '';
 		foreach($response->getResults() as $doc) {
-			$result .= self::collage_item_from_content($doc, $atts['cols']);
+			$result .= self::collage_item_from_content($doc, $atts['cols'], $atts['item-height']);
 		}
 		return $result;
 	}

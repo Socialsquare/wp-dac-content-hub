@@ -6,7 +6,6 @@
 .dac-collage__item {
 	box-shadow: none !important; /* FIXME: Refactor this */
 	display: inline-block;
-	height: 150px;
 	position: relative;
   background-position: center;
   background-size: cover;
