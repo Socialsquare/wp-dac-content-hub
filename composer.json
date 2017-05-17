@@ -14,5 +14,13 @@
     "php": "^7.0",
     "prismic/php-sdk": "3.*",
     "composer/installers": "~1.0"
+  },
+  "scripts": {
+    "dist": [
+      "@composer install",
+      "@composer archive -f zip --dir ./dist",
+      "rm -rf ./vendor",
+      "rm composer.lock"
+    ]
   }
 }
