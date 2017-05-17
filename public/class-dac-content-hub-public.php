@@ -49,6 +49,8 @@ class Dac_Content_Hub_Public {
 	 */
 	private $prismic;
 
+	private $base_path = 'content';
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -119,7 +121,7 @@ class Dac_Content_Hub_Public {
 
 	public function add_rewrite_rules() {
 		// @see https://codex.wordpress.org/Rewrite_API/add_rewrite_rule
-		add_rewrite_rule('^content/([a-z1-9\-_]+)/([a-z1-9\-_]+)/?',
+		add_rewrite_rule('^' . $this->base_path . '/([a-z1-9\-_]+)/([a-z1-9\-_]+)/?',
 										 'index.php?content_type=$matches[1]&content_uid=$matches[2]',
 										 'top');
 	}
@@ -135,6 +137,8 @@ class Dac_Content_Hub_Public {
 		  $content = $api->getByUID($content_type, $content_uid);
 			$content_object = (object) $this->post_data_from_content($content);
 
+			var_dump(get_permalink($content_object));
+
 			$query->queried_object = $content_object;
 			$query->queried_object_id = $content->getUID();
 			// $query->is_page = true;
@@ -148,7 +152,7 @@ class Dac_Content_Hub_Public {
 		}
 	}
 
-	public function post_data_from_content($content) {
+	private function post_data_from_content($content) {
 		$type = $content->getType();
 		$resolver = $this->prismic->linkResolver;
 
@@ -195,6 +199,18 @@ class Dac_Content_Hub_Public {
 		}
 	}
 
+	public function generate_content_link($type, $urn) {
+		return home_url('/' . $this->base_path . '/' . $type . '/' . $urn);
+	}
+
+	public function post_link($permalink, $post, $leavename) {
+		if(property_exists($post, 'content')) {
+			// We assume it's from the content hub
+			return $this->generate_content_link($post->post_type, $post->post_name);
+		}
+		return $permalink;
+	}
+
 	public static function clean_query_string($query_string) {
 		$query_string = str_replace('&#8220;', '"', $query_string);
 		$query_string = str_replace('&#8221;', '"', $query_string);
@@ -205,10 +221,10 @@ class Dac_Content_Hub_Public {
 		return '<div class="dac-collage__overlay">' . $inside_html . '</div>';
 	}
 
-	public static function collage_item_from_content($content, $cols, $height) {
+	public function collage_item_from_content($content, $cols, $height) {
 		$type = $content->getType();
+		$href = $this->generate_content_link($type, $content->getSlug());
 		if($type === 'case') {
-			$href = home_url('/content/case/' . $content->getSlug());
 			$pictures = $content->getGroup('case.pictures')->getArray();
 			$first_picture = array_shift($pictures);
 			$background_url = $first_picture->getImage('picture')->getUrl();
@@ -246,7 +262,7 @@ class Dac_Content_Hub_Public {
 		$response = $api->query($query_string);
 		$result = '';
 		foreach($response->getResults() as $doc) {
-			$result .= self::collage_item_from_content($doc, $atts['cols'], $atts['item-height']);
+			$result .= $this->collage_item_from_content($doc, $atts['cols'], $atts['item-height']);
 		}
 		$collage_classes = 'dac-collage';
 		if($atts['full-width'] !== false) {
