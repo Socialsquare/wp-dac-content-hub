@@ -69,7 +69,7 @@ class Dac_Content_Hub {
 	public function __construct() {
 
 		$this->plugin_name = 'dac-content-hub';
-		$this->version = '0.1';
+		$this->version = '0.1.0';
 
 		$this->load_dependencies();
 		$this->set_locale();

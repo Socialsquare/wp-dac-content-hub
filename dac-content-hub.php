@@ -9,14 +9,14 @@
  * that starts the plugin.
  *
  * @link              http://socialsquare.dk
- * @since             1.0.0
+ * @since             0.1.0
  * @package           Dac_Content_Hub
  *
  * @wordpress-plugin
  * Plugin Name:       DAC Content Hub
  * Plugin URI:        http://www.dac.dk/content-hub
  * Description:       Connecting WordPress with the DAC content hub
- * Version:           1.0.0
+ * Version:           0.1.0
  * Author:            Kræn Hansen
  * Author URI:        http://socialsquare.dk
  * License:           GPL-2.0+
