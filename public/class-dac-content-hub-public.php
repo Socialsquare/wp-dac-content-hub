@@ -248,7 +248,11 @@ class Dac_Content_Hub_Public {
 		foreach($response->getResults() as $doc) {
 			$result .= self::collage_item_from_content($doc, $atts['cols'], $atts['item-height']);
 		}
-		return $result;
+		$collage_classes = 'dac-collage';
+		if($atts['full-width'] !== false) {
+			$collage_classes .= ' dac-collage--full-width';
+		}
+		return '<div class="' . $collage_classes . '">' . $result . '</div>';
 	}
 
 }

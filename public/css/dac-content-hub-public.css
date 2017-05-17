@@ -3,13 +3,24 @@
  * included in this file.
  */
 
+.dac-collage {
+	display: flex;
+	flex-flow: row wrap;
+}
+
+.dac-collage--full-width {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+}
+
 .dac-collage__item {
 	box-shadow: none !important; /* FIXME: Refactor this */
 	display: inline-block;
 	position: relative;
   background-position: center;
   background-size: cover;
-  margin-bottom: -7px; /* FIXME: Refactor this */
 }
 
 .dac-collage__overlay {
