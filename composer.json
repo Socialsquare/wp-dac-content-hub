@@ -4,6 +4,9 @@
   "type": "wordpress-plugin",
   "license": "MIT",
   "description": "Connecting WordPress with a content hub",
+  "archive": {
+    "exclude": ["/dist"]
+  },
   "authors": [
     {
       "name": "Kraen Hansen",
