@@ -36,14 +36,14 @@ class Prismic_Helper {
       if ($value && in_array($name, ['type', 'id', 'tags'])) {
         $query[] = Predicates::at("document.$name", $value);
       }
-      if ($value && $type && !in_array($name, ['type', 'id', 'tags'])) {
+      if ($value && $type && !in_array($name, ['type', 'id', 'tags', 'view_mode'])) {
         switch ($type) {
           case 'organisation':
             // We need to use the group this field is in.
-            $query[] = Predicates::at("$type.actors.$name", $value);
+            $query[] = Predicates::at("my.$type.actors.$name", $value);
             break;
           default:
-            $query[] = Predicates::at("$type.$name", $value);
+            $query[] = Predicates::at("my.$type.$name", $value);
         }
       }
     }

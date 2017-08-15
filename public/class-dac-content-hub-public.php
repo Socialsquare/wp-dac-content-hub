@@ -247,9 +247,7 @@ class Dac_Content_Hub_Public {
 		if (!empty($template) && !empty($context)) {
 			return $twig->render($template, $context);
 		}
-
 	}
-
 
 	/**
 	 * Initialize shortcode.
@@ -261,16 +259,19 @@ class Dac_Content_Hub_Public {
 	/**
 	 * Shortcode callback.
 	 */
-	public function dac_shortcode($attributes = [], $content = null, $cols = 3) {
+	public function dac_shortcode($attributes = [], $content = null ) {
 		$attributes = shortcode_atts(
 			array(
 				// Default to case only.
 				'type' => 'case',
+				'limit' => null,
+				'view_mode' => null,
 				'organisation' => null,
 				'tags' => [],
 				'category' => null,
 				'area' => null,
 				'id' => null,
+				'uid' => null,
 				'year' => null,
 			),
 			$attributes,
@@ -282,8 +283,7 @@ class Dac_Content_Hub_Public {
 		foreach($response->getResults() as $doc) {
 			$result .= $this->dac_format_data($doc);
 		}
-		$collage_classes = 'dac-collage';
-		return '<div class="' . $collage_classes . '">' . $result . '</div>';
+		return $result;
 	}
 
 }
