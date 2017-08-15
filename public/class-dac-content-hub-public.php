@@ -210,6 +210,9 @@ class Dac_Content_Hub_Public {
 		return '<div class="dac-collage__overlay">' . $inside_html . '</div>';
 	}
 
+	/**
+	 * Twig powered data formatter.
+	 */
 	public function dac_format_data($doc) {
 		// Use twig for templating.
 		$loader = new Twig_Loader_Filesystem(plugin_dir_path( __FILE__ ) . 'templates');
@@ -247,10 +250,17 @@ class Dac_Content_Hub_Public {
 
 	}
 
+
+	/**
+	 * Initialize shortcode.
+	 */
 	public function add_shortcodes() {
 		add_shortcode('content-hub', array($this, 'dac_shortcode'));
 	}
 
+	/**
+	 * Shortcode callback.
+	 */
 	public function dac_shortcode($attributes = [], $content = null, $cols = 3) {
 		$attributes = shortcode_atts(
 			array(
