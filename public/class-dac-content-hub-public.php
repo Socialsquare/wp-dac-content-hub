@@ -48,7 +48,6 @@ class Dac_Content_Hub_Public {
 	* @var      Prismic_Helper    $prismic    The prismic helper
 	*/
 	private $prismic;
-
 	private $base_path = 'content';
 
 	/**
@@ -215,14 +214,30 @@ class Dac_Content_Hub_Public {
 		// Use twig for templating.
 		$loader = new Twig_Loader_Filesystem(plugin_dir_path( __FILE__ ) . 'templates');
 		$twig = new Twig_Environment($loader);
+		// Prismic link resolver.
+		$resolver = $this->prismic->linkResolver;
 		// Decide template per content type.
 		$template = '';
 		$context = [];
 		switch ($doc->getType()) {
 			case 'case':
-				$template = 'case.html.twig';
+			    // Teaser template file.
+				$template = 'case--teaser.html.twig';
+				// Content.
+				$images = $doc->getGroup('case.pictures')->getArray();
+				$image_attributes = array_map(function ($image) {
+					return [
+						'src' => $image->getImage('picture')->getUrl(),
+						'alt' =>  $image->getImage('picture')->getAlt(),
+						'width' => $image->getImage('picture')->getWidth(),
+						'height' => $image->getImage('picture')->getHeight(),
+					];
+				}, $images);
+				$image_attributes_first = array_shift($image_attributes);;
 			    $context = [
-					'type' => $doc->getType(),
+					'title' => $doc->getText('case.title'),
+					'image' => $image_attributes_first,
+					'teaser_text' => $doc->getStructuredText('case.short-description')->asHtml($resolver),
 				];
 				break;
 		}
