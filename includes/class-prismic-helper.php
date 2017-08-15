@@ -19,15 +19,35 @@ class Prismic_Helper {
 
   private $api = null;
 
-  public function get_api() {
+  public function query($predicates) {
     // $url = $container->get('settings')['prismic.url'];
     // $token = $container->get('settings')['prismic.token'];
     $url = 'https://dac-content-hub.prismic.io/api';
     $token = null;
-    if ($this->api == null) {
+    try {
       $this->api = Api::get($url, $token);
+    } catch (Exeption $e) {
+      echo 'Caught exception: ',  $e->getMessage(), "\n";
     }
 
-    return $this->api;
+    $query = [];
+    $type = $predicates['type'] ?: null;
+    foreach ($predicates as $name => $value) {
+      if ($value && in_array($name, ['type', 'id', 'tags'])) {
+        $query[] = Predicates::at("document.$name", $value);
+      }
+      if ($value && $type && !in_array($name, ['type', 'id', 'tags'])) {
+        switch ($type) {
+          case 'organisation':
+            // We need to use the group this field is in.
+            $query[] = Predicates::at("$type.actors.$name", $value);
+            break;
+          default:
+            $query[] = Predicates::at("$type.$name", $value);
+        }
+      }
+    }
+
+    return $this->api->query($query);
   }
 }
