@@ -214,15 +214,18 @@ class Dac_Content_Hub_Public {
 	 * Twig powered data formatter.
 	 */
 	public function dac_format_data($doc) {
+		$type = $doc->getType();
 		// Use twig for templating.
 		$loader = new Twig_Loader_Filesystem(plugin_dir_path( __FILE__ ) . 'templates');
 		$twig = new Twig_Environment($loader);
 		// Prismic link resolver.
 		$resolver = $this->prismic->linkResolver;
+		// Generate url.
+		$href = $this->generate_content_link($type, $doc->getSlug());
 		// Decide template per content type.
 		$template = '';
 		$context = [];
-		switch ($doc->getType()) {
+		switch ($type) {
 			case 'case':
 			    // Teaser template file.
 				$template = 'case--teaser.html.twig';
@@ -241,6 +244,7 @@ class Dac_Content_Hub_Public {
 					'title' => $doc->getText('case.title'),
 					'image' => $image_attributes_first,
 					'teaser_text' => $doc->getStructuredText('case.short-description')->asHtml($resolver),
+					'href' => $href,
 				];
 				break;
 		}

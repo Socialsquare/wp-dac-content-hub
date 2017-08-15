@@ -22,7 +22,7 @@ class Prismic_Helper {
   public function query($predicates) {
     // $url = $container->get('settings')['prismic.url'];
     // $token = $container->get('settings')['prismic.token'];
-    $url = 'https://dac-content-hub.prismic.io/api';
+    $url = 'https://dac-content-hub.cdn.prismic.io/api';
     $token = null;
     try {
       $this->api = Api::get($url, $token);
