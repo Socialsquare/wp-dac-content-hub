@@ -212,8 +212,24 @@ class Dac_Content_Hub_Public {
 	}
 
 	public function dac_format_data($doc) {
-		$type = $doc->getType();
-		return "<pre>$type</pre>";
+		// Use twig for templating.
+		$loader = new Twig_Loader_Filesystem(plugin_dir_path( __FILE__ ) . 'templates');
+		$twig = new Twig_Environment($loader);
+		// Decide template per content type.
+		$template = '';
+		$context = [];
+		switch ($doc->getType()) {
+			case 'case':
+				$template = 'case.html.twig';
+			    $context = [
+					'type' => $doc->getType(),
+				];
+				break;
+		}
+		if (!empty($template) && !empty($context)) {
+			return $twig->render($template, $context);
+		}
+
 	}
 
 	public function add_shortcodes() {
