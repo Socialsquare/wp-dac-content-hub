@@ -120,17 +120,17 @@ class Dac_Content_Hub_Public {
 
 	public function add_rewrite_rules() {
 		// @see https://codex.wordpress.org/Rewrite_API/add_rewrite_rule
-		add_rewrite_rule(
-			'^' . $this->base_path . '/([a-z1-9\-_]+)/([a-z1-9\-_]+)/?',
-			'index.php?content_type=$matches[1]&content_uid=$matches[2]',
-			'top'
-		);
+		$regex = '^' . $this->base_path . '/([a-z1-9\-_]+)/([a-z1-9\-_]+)/?';
+		$redirect = 'index.php?content_type=$matches[0]&content_uid=$matches[1]';
+		$after = 'top';
+		add_rewrite_rule($regex, $redirect, $after);
 	}
 
 	public function posts_pre_query($return, WP_Query $query) {
 		$has_content_type = array_key_exists('content_type', $query->query_vars);
 		$has_content_uid = array_key_exists('content_uid', $query->query_vars);
-		if($has_content_type && $has_content_uid) {
+
+		if ($has_content_type && $has_content_uid) {
 			$content_type = $query->query_vars['content_type'];
 			$content_uid = $query->query_vars['content_uid'];
 
@@ -146,8 +146,6 @@ class Dac_Content_Hub_Public {
 			return array(
 				$content_object
 			);
-		} else {
-			return $return;
 		}
 	}
 
@@ -163,7 +161,7 @@ class Dac_Content_Hub_Public {
 			return array(
 				'ID' => PHP_INT_MAX,
 				'post_type' => $type,
-				'post_title' => $content->getStructuredText('case.title')->asText(),
+				'post_title' => $content->getText('case.title'),
 				'post_name' => $content->getUID(),
 				'post_date' => $first_publication ? $first_publication->format('Y-m-d H:i:s') : null,
 				'post_modified' => $last_publication ? $last_publication->format('Y-m-d H:i:s') : null,

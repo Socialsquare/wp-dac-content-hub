@@ -11,15 +11,12 @@ use Prismic\Predicates;
 class Prismic_Helper {
 
   public $linkResolver;
+  private $api = null;
 
   public function __construct()
   {
     $this->linkResolver = new PrismicLinkResolver($this);
-  }
 
-  private $api = null;
-
-  public function query($predicates) {
     // $url = $container->get('settings')['prismic.url'];
     // $token = $container->get('settings')['prismic.token'];
     $url = 'https://dac-content-hub.cdn.prismic.io/api';
@@ -29,7 +26,13 @@ class Prismic_Helper {
     } catch (Exeption $e) {
       echo 'Caught exception: ',  $e->getMessage(), "\n";
     }
+  }
 
+  public function get_api() {
+    return $this->api;
+  }
+
+  public function query($predicates) {
     $query = [];
     $type = $predicates['type'] ?: null;
     foreach ($predicates as $name => $value) {
