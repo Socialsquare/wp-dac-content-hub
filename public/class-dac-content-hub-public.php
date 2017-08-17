@@ -134,7 +134,7 @@ class Dac_Content_Hub_Public {
 			$content_type = $query->query_vars['content_type'];
 			$content_uid = $query->query_vars['content_uid'];
 
-			$api = $this->prismic->get_api();
+			$api = $this->prismic->getAapi();
 			$content = $api->getByUID($content_type, $content_uid);
 			$content_object = (object) $this->post_data_from_content($content);
 
@@ -270,11 +270,11 @@ class Dac_Content_Hub_Public {
 				'view_mode' => null,
 				'organisation' => null,
 				'tags' => [],
-				'category' => null,
-				'area' => null,
+				'case_category' => null,
+				'case_area' => null,
 				'id' => null,
 				'uid' => null,
-				'year' => null,
+				'build_year' => null,
 			),
 			$attributes,
 			'content-collage'
