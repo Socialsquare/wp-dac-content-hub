@@ -40,7 +40,7 @@ class Prismic_Helper {
 		try {
 			$this->api = Api::get( $url, $token );
 		} catch ( Exeption $e ) {
-			echo 'Caught exception: ',  $e->getMessage(), "\n";
+			throw new Error( $e->getMessage() );
 		}
 	}
 
@@ -86,7 +86,7 @@ class Prismic_Helper {
 		$query = [];
 		$type = $predicates['type'] ?: null;
 		foreach ( $predicates as $name => $value ) {
-			if ( $value && in_array( $name, [ 'type', 'id', 'tags' ], true ) ) {
+			if ( $value && [ $name, [ 'type', 'id', 'tags' ], true ] ) {
 				$query[] = Predicates::at( "document.$name", $value );
 			}
 			if ( $value && $type && ! in_array( $name, [ 'type', 'id', 'tags', 'view_mode' ], true ) ) {

@@ -27,7 +27,7 @@
 
 // Load the composer autoloader - if it exists
 $local_autoloader_path = plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
-if(file_exists($local_autoloader_path)) {
+if ( file_exists( $local_autoloader_path ) ) {
   require $local_autoloader_path;
 }
 
