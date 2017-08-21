@@ -97,7 +97,17 @@ class Dac_Content_Hub_Admin {
 		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dac-content-hub-admin.js', [ 'jquery' ], $this->version, false );
-
+		wp_localize_script( $this->plugin_name, 'plugin_dir', plugin_dir_url( __FILE__ ) );
 	}
+
+	public function dac_register_shortcode_button( $buttons ) {
+		array_push( $buttons, '|', 'dac_content_hub' );
+		return $buttons;
+	}
+
+	public function dac_add_shortcode_button( $plugin_array ) {
+		$plugin_array['dac_shortcode'] = plugins_url( '/js/dac.prismic-shortcode.js', __FILE__ );
+		return $plugin_array;
+	 }
 
 }

@@ -309,7 +309,7 @@ class Dac_Content_Hub_Public {
 				'build_year' => null,
 			],
 			$attributes,
-			'content-collage'
+			'content-hub'
 		);
 
 		$response = $this->prismic->query( $attributes );
