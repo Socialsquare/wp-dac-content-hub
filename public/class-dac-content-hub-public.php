@@ -1,67 +1,67 @@
 <?php
 /**
- * The public-facing functionality of the plugin.
- *
- *  @link       http://socialsquare.dk
- *  @since      1.0.0
- *
- * @package    Dac_Content_Hub
- * @subpackage Dac_Content_Hub/public
- */
+* The public-facing functionality of the plugin.
+*
+*  @link       http://socialsquare.dk
+*  @since      1.0.0
+*
+* @package    Dac_Content_Hub
+* @subpackage Dac_Content_Hub/public
+*/
 
 /**
- * The public-facing functionality of the plugin.
- *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
- *
- * @package    Dac_Content_Hub
- * @subpackage Dac_Content_Hub/public
- * @author     Kræn Hansen <kraen@socialsquare.dk>
- */
+* The public-facing functionality of the plugin.
+*
+* Defines the plugin name, version, and two examples hooks for how to
+* enqueue the admin-specific stylesheet and JavaScript.
+*
+* @package    Dac_Content_Hub
+* @subpackage Dac_Content_Hub/public
+* @author     Kræn Hansen <kraen@socialsquare.dk>
+*/
 class Dac_Content_Hub_Public {
 
 	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
+	* The ID of this plugin.
+	*
+	* @since    1.0.0
+	* @access   private
+	* @var      string    $plugin_name    The ID of this plugin.
+	*/
 	private $plugin_name;
 
 	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
+	* The version of this plugin.
+	*
+	* @since    1.0.0
+	* @access   private
+	* @var      string    $version    The current version of this plugin.
+	*/
 	private $version;
 
 	/**
-	 * The helper used when communicating with the prismic CMS.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      Prismic_Helper    $prismic    The prismic helper
-	 */
+	* The helper used when communicating with the prismic CMS.
+	*
+	* @since    1.0.0
+	* @access   private
+	* @var      Prismic_Helper    $prismic    The prismic helper
+	*/
 	private $prismic;
 
 	/**
-	 * Base path.
-	 *
-	 * @var string
-	 */
+	* Base path.
+	*
+	* @var string
+	*/
 	private $base_path = 'content';
 
 	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since 1.0.0
-	 * @param string $plugin_name The name of the plugin.
-	 * @param string $version The version of this plugin.
-	 */
+	* Initialize the class and set its properties.
+	*
+	* @since 1.0.0
+	* @param string $plugin_name The name of the plugin.
+	* @param string $version The version of this plugin.
+	*/
 	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
@@ -72,31 +72,31 @@ class Dac_Content_Hub_Public {
 	}
 
 	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since 1.0.0
-	 */
+	* Register the stylesheets for the public-facing side of the site.
+	*
+	* @since 1.0.0
+	*/
 	public function enqueue_styles() {
 
 		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Dac_Content_Hub_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Dac_Content_Hub_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+		* This function is provided for demonstration purposes only.
+		*
+		* An instance of this class should be passed to the run() function
+		* defined in Dac_Content_Hub_Loader as all of the hooks are defined
+		* in that particular class.
+		*
+		* The Dac_Content_Hub_Loader will then create the relationship
+		* between the defined hooks and the functions defined in this
+		* class.
+		*/
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/dac-content-hub-public.css', array(), $this->version, 'all' );
 	}
 
 	/**
-	 * Register the JavaScript for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 */
+	* Register the JavaScript for the public-facing side of the site.
+	*
+	* @since    1.0.0
+	*/
 	public function enqueue_scripts() {
 
 		/**
@@ -116,12 +116,12 @@ class Dac_Content_Hub_Public {
 	}
 
 	/**
-	 * URL query variables.
-	 *
-	 * @param array $vars Query variables.
-	 *
-	 * @return array $vars
-	 */
+	* URL query variables.
+	*
+	* @param array $vars Query variables.
+	*
+	* @return array $vars
+	*/
 	public function add_query_vars( $vars ) {
 		$vars[] = 'content_type';
 		$vars[] = 'content_uid';
@@ -129,10 +129,10 @@ class Dac_Content_Hub_Public {
 	}
 
 	/**
-	 * Add rewrite rules to WordPress.
-	 *
-	 * @return void
-	 */
+	* Add rewrite rules to WordPress.
+	*
+	* @return void
+	*/
 	public function add_rewrite_rules() {
 		// @see https://codex.wordpress.org/Rewrite_API/add_rewrite_rule
 		$regex = '^' . $this->base_path . '/([a-z1-9\-_]+)/([a-z1-9\-_]+)/?';
@@ -142,9 +142,9 @@ class Dac_Content_Hub_Public {
 	}
 
 	/**
-	 * Hijack wordpress queries.
-	 *
-	 */
+	* Hijack wordpress queries.
+	*
+	*/
 	public function posts_pre_query( $return, WP_Query $query ) {
 		$has_content_type = array_key_exists( 'content_type', $query->query_vars );
 		$has_content_uid = array_key_exists( 'content_uid', $query->query_vars );
@@ -169,8 +169,18 @@ class Dac_Content_Hub_Public {
 	}
 
 	/**
-	 * Hijack a WordPress page.
+	 * Thumbnail output.
 	 */
+	public function post_thumbnail_html($html, $post_id, $post_thumbnail_id, $size, $attr) {
+		$post = get_post();
+		if($post->post_type === 'case') {
+			$pictures = $post->content->getGroup('case.pictures')->getArray();
+		}
+	}
+
+	/**
+	* Hijack a WordPress page.
+	*/
 	private function post_data_from_content( $content ) {
 		$type = $content->getType();
 		$resolver = $this->prismic->link_resolver;
@@ -206,18 +216,18 @@ class Dac_Content_Hub_Public {
 	}
 
 	/**
-	 * Build a content link.
-	 *
-	 * @param string $type Content type.
-	 * @param string $urn  Content url.
-	 */
+	* Build a content link.
+	*
+	* @param string $type Content type.
+	* @param string $urn  Content url.
+	*/
 	public function generate_content_link( $type, $urn ) {
 		return home_url( '/' . $this->base_path . '/' . $type . '/' . $urn );
 	}
 
 	/**
-	 * Build post link.
-	 */
+	* Build post link.
+	*/
 	public function post_link( $permalink, $post, $leavename ) {
 		if ( property_exists( $post, 'content' ) ) {
 			// We assume it's from the content hub.
@@ -227,10 +237,10 @@ class Dac_Content_Hub_Public {
 	}
 
 	/**
-	 * Twig powered data formatter.
-	 *
-	 * @param object $doc Prismic document.
-	 */
+	* Twig powered data formatter.
+	*
+	* @param object $doc Prismic document.
+	*/
 	public function dac_format_data( $doc ) {
 		$type = $doc->getType();
 		// Use twig for templating.
@@ -245,26 +255,26 @@ class Dac_Content_Hub_Public {
 		$context = [];
 		switch ( $type ) {
 			case 'case':
-				// Teaser template file.
-				$template = 'case--teaser.html.twig';
-				// Content.
-				$images = $doc->getGroup( 'case.pictures' )->getArray();
-				$image_attributes = array_map(function ( $image ) {
-					return [
-						'src' => $image->getImage( 'picture' )->getUrl(),
-						'alt' => $image->getImage( 'picture' )->getAlt(),
-						'width' => $image->getImage( 'picture' )->getWidth(),
-						'height' => $image->getImage( 'picture' )->getHeight(),
-					];
-				}, $images);
-				$image_attributes_first = array_shift( $image_attributes );
-				$context = [
-					'title' => $doc->getText( 'case.title' ),
-					'image' => $image_attributes_first,
-					'teaser_text' => $doc->getStructuredText( 'case.short-description' )->asHtml( $resolver ),
-					'href' => $href,
+			// Teaser template file.
+			$template = 'case--teaser.html.twig';
+			// Content.
+			$images = $doc->getGroup( 'case.pictures' )->getArray();
+			$image_attributes = array_map(function ( $image ) {
+				return [
+					'src' => $image->getImage( 'picture' )->getUrl(),
+					'alt' => $image->getImage( 'picture' )->getAlt(),
+					'width' => $image->getImage( 'picture' )->getWidth(),
+					'height' => $image->getImage( 'picture' )->getHeight(),
 				];
-				break;
+			}, $images);
+			$image_attributes_first = array_shift( $image_attributes );
+			$context = [
+				'title' => $doc->getText( 'case.title' ),
+				'image' => $image_attributes_first,
+				'teaser_text' => $doc->getStructuredText( 'case.short-description' )->asHtml( $resolver ),
+				'href' => $href,
+			];
+			break;
 		}
 		if ( ! empty( $template ) && ! empty( $context ) ) {
 			return $twig->render( $template, $context );
@@ -272,17 +282,17 @@ class Dac_Content_Hub_Public {
 	}
 
 	/**
-	 * Initialize shortcode.
-	 */
+	* Initialize shortcode.
+	*/
 	public function add_shortcodes() {
 		add_shortcode( 'content-hub', array( $this, 'dac_shortcode' ) );
 	}
 
 	/**
-	 * Shortcode callback.
-	 *
-	 * @param array $attributes Shortcode attributes.
-	 */
+	* Shortcode callback.
+	*
+	* @param array $attributes Shortcode attributes.
+	*/
 	public function dac_shortcode( $attributes = [] ) {
 		$attributes = shortcode_atts(
 			array(
