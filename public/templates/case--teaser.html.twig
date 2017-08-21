@@ -1,0 +1,17 @@
+<a href="{{ href }}">
+    <article class="case case--teaser">
+        <figure class="case__image">
+            <img
+                src="{{ image.src }}"
+                alt="{{ image.alt }}"
+                width="{{ image.width }}"
+                height="{{ image.height }}"
+            />
+            <figcaption >{{image.alt}}</figcaption>
+        </figure>
+        <h1 class="case__title">{{ title }}</h1>
+        <div class="case__teaser-text">
+            {{ teaser_text|raw }}
+        </div>
+    </article>
+</a>

@@ -16,7 +16,8 @@
   "require": {
     "php": "^7.0",
     "prismic/php-sdk": "3.*",
-    "composer/installers": "~1.0"
+    "composer/installers": "~1.0",
+    "twig/twig": "^2.4"
   },
   "scripts": {
     "dist": [

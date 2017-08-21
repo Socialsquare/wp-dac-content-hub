@@ -1,10 +1,9 @@
 <?php
-
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       http://socialsquare.dk
- * @since      1.0.0
+ *  @link       http://socialsquare.dk
+ *  @since      1.0.0
  *
  * @package    Dac_Content_Hub
  * @subpackage Dac_Content_Hub/public
@@ -49,14 +48,19 @@ class Dac_Content_Hub_Public {
 	 */
 	private $prismic;
 
+	/**
+	 * Base path.
+	 *
+	 * @var string
+	 */
 	private $base_path = 'content';
 
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of the plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @since 1.0.0
+	 * @param string $plugin_name The name of the plugin.
+	 * @param string $version The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 
@@ -70,7 +74,7 @@ class Dac_Content_Hub_Public {
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *
-	 * @since    1.0.0
+	 * @since 1.0.0
 	 */
 	public function enqueue_styles() {
 
@@ -85,9 +89,7 @@ class Dac_Content_Hub_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/dac-content-hub-public.css', array(), $this->version, 'all' );
-
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/dac-content-hub-public.css', [], $this->version, 'all' );
 	}
 
 	/**
@@ -109,164 +111,213 @@ class Dac_Content_Hub_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dac-content-hub-public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dac-content-hub-public.js', [ 'jquery' ], $this->version, false );
 
 	}
 
+	/**
+	 * URL query variables.
+	 *
+	 * @param array $vars Query variables.
+	 *
+	 * @return array $vars
+	 */
 	public function add_query_vars( $vars ) {
-		$vars[] = "content_type";
-		$vars[] = "content_uid";
+		$vars[] = 'content_type';
+		$vars[] = 'content_uid';
 		return $vars;
 	}
 
+	/**
+	 * Add rewrite rules to WordPress.
+	 *
+	 * @return void
+	 */
 	public function add_rewrite_rules() {
 		// @see https://codex.wordpress.org/Rewrite_API/add_rewrite_rule
-		add_rewrite_rule('^' . $this->base_path . '/([a-z1-9\-_]+)/([a-z1-9\-_]+)/?',
-										 'index.php?content_type=$matches[1]&content_uid=$matches[2]',
-										 'top');
+		$regex = "^$this->base_path/([a-z1-9\-_]+)/([a-z1-9\-_]+)/?";
+		$redirect = 'index.php?content_type=$matches[0]&content_uid=$matches[1]';
+		$after = 'top';
+		add_rewrite_rule( $regex, $redirect, $after );
 	}
 
-	public function posts_pre_query($return, WP_Query $query) {
-		$has_content_type = array_key_exists('content_type', $query->query_vars);
-		$has_content_uid = array_key_exists('content_uid', $query->query_vars);
-		if($has_content_type && $has_content_uid) {
+	/**
+	 * Hijack wordpress queries.
+	 *
+	 */
+	public function posts_pre_query( $return, WP_Query $query ) {
+		$has_content_type = array_key_exists( 'content_type', $query->query_vars );
+		$has_content_uid = array_key_exists( 'content_uid', $query->query_vars );
+
+		if ( $has_content_type && $has_content_uid ) {
 			$content_type = $query->query_vars['content_type'];
 			$content_uid = $query->query_vars['content_uid'];
 
 			$api = $this->prismic->get_api();
-		  $content = $api->getByUID($content_type, $content_uid);
-			$content_object = (object) $this->post_data_from_content($content);
+			$content = $api->getByUID( $content_type, $content_uid );
+			$content_object = (object) $this->post_data_from_content( $content );
 
 			$query->queried_object = $content_object;
 			$query->queried_object_id = $content->getUID();
-			// $query->is_page = true;
+			$query->is_page = true;
 			$query->is_single = true;
 
-			return array(
-				$content_object
-			);
-		} else {
-			return $return;
+			return [
+				$content_object,
+			];
 		}
 	}
 
-	private function post_data_from_content($content) {
-		$type = $content->getType();
-		$resolver = $this->prismic->linkResolver;
+	/**
+	 * Thumbnail output.
+	 */
+	public function post_thumbnail_html($html, $post_id, $post_thumbnail_id, $size, $attr) {
+		$post = get_post();
+		if($post->post_type === 'case') {
+			$pictures = $post->content->getGroup('case.pictures')->getArray();
+		}
+	}
 
-		if($type === 'case') {
+	/**
+	 * Hijack a WordPress page.
+	 */
+	private function post_data_from_content( $content ) {
+		$type = $content->getType();
+		$resolver = $this->prismic->link_resolver;
+
+		if ( 'case' === $type ) {
 			$first_publication = $content->getFirstPublicationDate();
 			$last_publication = $content->getLastPublicationDate();
-			$short_description = $content->getStructuredText('case.short-description');
-			// The ID needs to be faked to trick get_metadata into returning metadata
-			return array(
+			$short_description = $content->getStructuredText( 'case.short-description' );
+			// The ID needs to be faked to trick get_metadata into returning metadata.
+			return [
 				'ID' => PHP_INT_MAX,
 				'post_type' => $type,
-				'post_title' => $content->getStructuredText('case.title')->asText(),
+				'post_title' => $content->getText( 'case.title' ),
 				'post_name' => $content->getUID(),
-				'post_date' => $first_publication ? $first_publication->format('Y-m-d H:i:s') : null,
-				'post_modified' => $last_publication ? $last_publication->format('Y-m-d H:i:s') : null,
-				'post_excerpt' => $short_description ? $short_description->asHtml($resolver) : '',
-				'post_content' => $content->getStructuredText('case.description')->asHtml($resolver),
-				'content' => $content
-			);
+				'post_date' => $first_publication ? $first_publication->format( 'Y-m-d H:i:s' ) : null,
+				'post_modified' => $last_publication ? $last_publication->format( 'Y-m-d H:i:s' ) : null,
+				'post_excerpt' => $short_description ? $short_description->asHtml( $resolver ) : '',
+				'post_content' => $content->getStructuredText( 'case.description' )->asHtml( $resolver ),
+				'content' => $content,
+			];
 		} else {
-			throw new Error('Unexpected content-type: ' . $type);
+			throw new Error( "Unexpected content-type: $type" );
 		}
 	}
 
-	public function get_post_metadata($value, $object_id, $meta_key, $single) {
+	public function get_post_metadata( $value, $object_id, $meta_key, $single ) {
 		$post = get_post();
-		if($meta_key === '_thumbnail_id' && $post->post_type === 'case') {
+		if ( '_thumbnail_id' === $meta_key && 'case' === $post->post_type ) {
 			return true;
 		} else {
 			return $value;
 		}
 	}
 
-	// post_thumbnail_html
-
-	public function post_thumbnail_html($html, $post_id, $post_thumbnail_id, $size, $attr) {
-		$post = get_post();
-		if($post->post_type === 'case') {
-			$pictures = $post->content->getGroup('case.pictures')->getArray();
-			$first_picture = array_shift($pictures);
-			return $first_picture->getImage('picture')->asHtml();
-		} else {
-			return $html;
-		}
+	/**
+	 * Build a content link.
+	 *
+	 * @param string $type Content type.
+	 * @param string $urn  Content url.
+	 */
+	public function generate_content_link( $type, $urn ) {
+		return home_url( "/$this->base_path/$type/$urn" );
 	}
 
-	public function generate_content_link($type, $urn) {
-		return home_url('/' . $this->base_path . '/' . $type . '/' . $urn);
-	}
-
-	public function post_link($permalink, $post, $leavename) {
-		if(property_exists($post, 'content')) {
-			// We assume it's from the content hub
-			return $this->generate_content_link($post->post_type, $post->post_name);
+	/**
+	 * Build post link.
+	 */
+	public function post_link( $permalink, $post, $leavename ) {
+		if ( property_exists( $post, 'content' ) ) {
+			// We assume it's from the content hub.
+			return $this->generate_content_link( $post->post_type, $post->post_name );
 		}
 		return $permalink;
 	}
 
-	public static function clean_query_string($query_string) {
-		$query_string = str_replace('&#8220;', '"', $query_string);
-		$query_string = str_replace('&#8221;', '"', $query_string);
-		return trim(strip_tags($query_string));
-	}
-
-	public static function overlay_html($inside_html) {
-		return '<div class="dac-collage__overlay">' . $inside_html . '</div>';
-	}
-
-	public function collage_item_from_content($content, $cols, $height) {
-		$type = $content->getType();
-		$href = $this->generate_content_link($type, $content->getSlug());
-		if($type === 'case') {
-			$pictures = $content->getGroup('case.pictures')->getArray();
-			$first_picture = array_shift($pictures);
-			$background_url = $first_picture->getImage('picture')->getUrl();
-
-			$style = 'width:' . 100 / $cols . '%;';
-			$style .= 'height:' . $height . ';';
-			$style .= 'background-image:url(' . $background_url . ');';
-
-			$inside_html = $content->getStructuredText('case.title')->asText();
-			$overlay_html = self::overlay_html($inside_html);
-
-			return '<a href="' . $href . '" style="' . $style . '" class="dac-collage__item">' . $overlay_html . '</a>';
-		} else {
-			throw new Error('Unexpected content-type: ' . $type);
+	/**
+	 * Twig powered data formatter.
+	 *
+	 * @param object $doc Prismic document.
+	 */
+	public function dac_format_data( $doc ) {
+		$type = $doc->getType();
+		// Use twig for templating.
+		$loader = new Twig_Loader_Filesystem( plugin_dir_path( __FILE__ ) . 'templates' );
+		$twig = new Twig_Environment( $loader );
+		// Prismic link resolver.
+		$resolver = $this->prismic->link_resolver;
+		// Generate url.
+		$href = $this->generate_content_link( $type, $doc->getSlug() );
+		// Decide template per content type.
+		$template = '';
+		$context = [];
+		switch ( $type ) {
+			case 'case':
+			// Teaser template file.
+			$template = 'case--teaser.html.twig';
+			// Content.
+			$images = $doc->getGroup( 'case.pictures' )->getArray();
+			$image_attributes = array_map(function ( $image ) {
+				return [
+					'src' => $image->getImage( 'picture' )->getUrl(),
+					'alt' => $image->getImage( 'picture' )->getAlt(),
+					'width' => $image->getImage( 'picture' )->getWidth(),
+					'height' => $image->getImage( 'picture' )->getHeight(),
+				];
+			}, $images);
+			$image_attributes_first = array_shift( $image_attributes );
+			$context = [
+				'title' => $doc->getText( 'case.title' ),
+				'image' => $image_attributes_first,
+				'teaser_text' => $doc->getStructuredText( 'case.short-description' )->asHtml( $resolver ),
+				'href' => $href,
+			];
+			break;
+		}
+		if ( ! empty( $template ) && ! empty( $context ) ) {
+			return $twig->render( $template, $context );
 		}
 	}
 
+	/**
+	 * Initialize shortcode.
+	 */
 	public function add_shortcodes() {
-		add_shortcode('content-collage', array($this, 'content_collage_shortcode'));
+		add_shortcode( 'content-hub', [ $this, 'dac_shortcode' ] );
 	}
 
-	public function content_collage_shortcode($atts = [], $content = null, $cols = 3) {
-		$atts = shortcode_atts(
-			array(
-				'cols' => 3,
-				'item-height' => '150px',
-				'full-width' => false
-			),
-			$atts,
+	/**
+	 * Shortcode callback.
+	 *
+	 * @param array $attributes Shortcode attributes.
+	 */
+	public function dac_shortcode( $attributes = [] ) {
+		$attributes = shortcode_atts(
+			[
+				// Default to case only.
+				'type' => 'case',
+				'limit' => null,
+				'view_mode' => null,
+				'organisation' => null,
+				'tags' => [],
+				'case_category' => null,
+				'case_area' => null,
+				'id' => null,
+				'uid' => null,
+				'build_year' => null,
+			],
+			$attributes,
 			'content-collage'
 		);
 
-		$api = $this->prismic->get_api();
-		$query_string = self::clean_query_string($content);
-		$response = $api->query($query_string);
+		$response = $this->prismic->query( $attributes );
 		$result = '';
-		foreach($response->getResults() as $doc) {
-			$result .= $this->collage_item_from_content($doc, $atts['cols'], $atts['item-height']);
+		foreach ( $response->getResults() as $doc ) {
+			$result .= $this->dac_format_data( $doc );
 		}
-		$collage_classes = 'dac-collage';
-		if($atts['full-width'] !== false) {
-			$collage_classes .= ' dac-collage--full-width';
-		}
-		return '<div class="' . $collage_classes . '">' . $result . '</div>';
+		return $result;
 	}
 
 }
