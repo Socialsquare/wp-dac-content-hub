@@ -86,10 +86,11 @@ class Prismic_Helper {
 		$query = [];
 		$type = $predicates['type'] ?: null;
 		foreach ( $predicates as $name => $value ) {
-			if ( $value && [ $name, [ 'type', 'id', 'tags' ], true ] ) {
+			if ( $value && in_array( $name, [ 'type', 'id' ], true ) ) {
 				$query[] = Predicates::at( "document.$name", $value );
 			}
-			if ( $value && $type && ! in_array( $name, [ 'type', 'id', 'tags', 'view_mode' ], true ) ) {
+
+			if ( $value && $type && ! in_array( $name, [ 'type', 'id', 'view_mode' ], true ) ) {
 				switch ( $name ) {
 					case 'organisation':
 						// We need to use the group this field is in.
@@ -104,8 +105,14 @@ class Prismic_Helper {
 						}
 						break;
 
+					case 'tags':
+						$tags = explode(' ', $value );
+						$query[] = Predicates::any( "document.$name", $tags );
+						break;
+
 					default:
 						$query[] = Predicates::at( "my.$type.$name", $value );
+						break;
 				}
 			}
 		}
