@@ -1,13 +1,20 @@
-(function() {
-	/* Register the buttons */
+(($) => {
+	// Get settings.
+	var settings = window.dac_vars || null ;
+	// Abort if no settings.
+	if (!settings) {
+		return;
+	}
+	// Register buttons.
+
 	tinymce.create('tinymce.plugins.MyButtons', {
-		 init : function(editor, url) {
+		 init : (editor, url) => {
 			   // Add button.
 			  	editor.addButton( 'dac_content_hub', {
 					title : 'Create content hub shortcode',
 					// Button icon.
-					image : plugin_dir + '/img/dac.svg',
-					onclick : function() {
+					image : settings.plugin_dir + '/img/dac.svg',
+					onclick : () => {
 						// Open dialog with filter fields.
 						editor.windowManager.open({
 							title: 'Content hub',
@@ -44,7 +51,7 @@
 								}
 							],
 							// Submit handler.
-							onsubmit: function (e) {
+							onsubmit: (e) => {
 								var attributes = [];
 								// Create attrubutes from field values.
 								for (var i in e.data ) {
@@ -64,4 +71,4 @@
 	});
 	// Init plugin.
 	tinymce.PluginManager.add( 'dac_shortcode', tinymce.plugins.MyButtons );
-})();
+})(jQuery);

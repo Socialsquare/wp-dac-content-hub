@@ -41,17 +41,27 @@ class Dac_Content_Hub_Admin {
 	private $version;
 
 	/**
-	 * Initialize the class and set its properties.
+	 * The helper used when communicating with the prismic CMS.
 	 *
 	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @access   private
+	 * @var      Prismic_Helper    $prismic    The prismic helper
+	 */
+	private $prismic;
+
+	/**
+	 * Initialize the class and set its properties.
+	 *
+	 * @since 1.0.0
+	 * @param string $plugin_name The name of this plugin.
+	 * @param string $version The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
-
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
+		// Init prismic.
+		require_once plugin_dir_path( __FILE__ ) . '../includes/class-prismic-helper.php';
+		$this->prismic = new Prismic_Helper();
 	}
 
 	/**
@@ -97,7 +107,12 @@ class Dac_Content_Hub_Admin {
 		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dac-content-hub-admin.js', [ 'jquery' ], $this->version, false );
-		wp_localize_script( $this->plugin_name, 'plugin_dir', plugin_dir_url( __FILE__ ) );
+		$js_vars = [
+			'plugin_dir' => plugin_dir_url( __FILE__ ),
+			'dac_api_endpoint' => $this->prismic->api_endpoint,
+			'dac_api_token' => $this->prismic->api_token,
+		];
+		wp_localize_script( $this->plugin_name, 'dac_vars', $js_vars );
 	}
 
 	/**

@@ -21,11 +21,18 @@ class Prismic_Helper {
 	public $link_resolver;
 
 	/**
-	 * Prismic API helper.
+	 * Prismic API endpoint.
 	 *
-	 * @var API $api
+	 * @var string $api_endpoint
 	 */
-	private $api;
+	public $api_endpoint;
+
+	/**
+	 * Prismic API endpoint.
+	 *
+	 * @var string $api_token
+	 */
+	public $api_token;
 
 	/**
 	 * Constructor.
@@ -33,20 +40,22 @@ class Prismic_Helper {
 	public function __construct() {
 		$this->link_resolver = new PrismicLinkResolver( $this );
 		// Get settings.
-		$url = get_option( 'dac_api_endpoint' );
-		$token = get_option( 'dac_api_token' );
-		try {
-			$this->api = Api::get( $url, $token );
-		} catch ( Exeption $e ) {
-			throw new Error( $e->getMessage() );
-		}
+		$this->api_endpoint = get_option( 'dac_api_endpoint' );
+		$this->api_token = get_option( 'dac_api_token' );
 	}
 
 	/**
 	 * Expose api.
+	 *
+	 * @throws Error Error message.
+	 * @return Api
 	 */
 	public function get_api() {
-		return $this->api;
+		try {
+			return Api::get( $this->api_endpoint, $this->api_token );
+		} catch ( Exeption $e ) {
+			throw new Error( $e->getMessage() );
+		}
 	}
 
 	/**
@@ -104,7 +113,7 @@ class Prismic_Helper {
 						break;
 
 					case 'tags':
-						$tags = explode(' ', $value );
+						$tags = explode( ' ', $value );
 						$query[] = Predicates::any( "document.$name", $tags );
 						break;
 
