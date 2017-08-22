@@ -157,6 +157,11 @@ class Dac_Content_Hub {
 		$this->loader->add_filter( 'mce_buttons', $plugin_admin, 'dac_register_shortcode_button' );
 		$this->loader->add_filter( 'mce_external_plugins', $plugin_admin, 'dac_add_shortcode_button' );
 
+		if ( is_admin() ) {
+			$this->loader->add_action( 'admin_menu', $plugin_admin, 'dac_settings_menu' );
+			$this->loader->add_action( 'admin_init', $plugin_admin, 'dac_register_settings' );
+		}
+
 	}
 
 	/**

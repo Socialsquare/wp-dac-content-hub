@@ -32,11 +32,9 @@ class Prismic_Helper {
 	 */
 	public function __construct() {
 		$this->link_resolver = new PrismicLinkResolver( $this );
-
-		// $url = $container->get('settings')['prismic.url'];
-		// $token = $container->get('settings')['prismic.token'];
-		$url = 'https://dac-content-hub.cdn.prismic.io/api';
-		$token = null;
+		// Get settings.
+		$url = get_option( 'dac_api_endpoint' );
+		$token = get_option( 'dac_api_token' );
 		try {
 			$this->api = Api::get( $url, $token );
 		} catch ( Exeption $e ) {
