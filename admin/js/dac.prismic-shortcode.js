@@ -36,6 +36,11 @@
 									type: 'textbox',
 									name: 'build_year',
 									label: 'Build year'
+								},
+								{
+									type: 'textbox',
+									name: 'tags',
+									label: 'Tags'
 								}
 							],
 							// Submit handler.
