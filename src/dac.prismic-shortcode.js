@@ -21,6 +21,7 @@ import Api from './PrismicHelper';
 			if (result) {
 				// Attach result list.
 				itemList.classList.add('dac-autocomplete--list');
+				// Add calculated styles.
 				itemList.style.left = textbox.style.left;
 				itemList.style.top = textbox.style.height;
 				itemList.style.width = textbox.style.width;

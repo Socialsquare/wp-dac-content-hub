@@ -33,7 +33,7 @@ export default class {
 								resultList[result.id] = PrismicDOM.RichText.asText(result.data.area_name);
 								break;
 							case 'organisation':
-								result.data.name
+								resultList[result.id] = result.data.name;
 								break;
 							case 'case-category':
 								resultList[result.id] = PrismicDOM.RichText.asText(result.data.name);
