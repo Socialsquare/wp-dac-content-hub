@@ -2,3 +2,22 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+ul.dac-autocomplete--list {
+	background-color: rgba(255, 255, 255, 0.8);
+	border: 1px solid #ececec;
+	margin: 0 !important;
+	padding: 4px;
+	position: absolute;
+	z-index: 100;
+}
+
+ul.dac-autocomplete--list > li {
+	margin: -4px;
+	padding: 4px;
+}
+
+ul.dac-autocomplete--list > li:hover,
+ul.dac-autocomplete--list > li:focus {
+	background-color: #ececec;
+}

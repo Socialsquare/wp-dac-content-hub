@@ -105,12 +105,11 @@ class Dac_Content_Hub_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dac-content-hub-admin.js', [ 'jquery' ], $this->version, false );
 		$js_vars = [
 			'plugin_dir' => plugin_dir_url( __FILE__ ),
-			'dac_api_endpoint' => $this->prismic->api_endpoint,
-			'dac_api_token' => $this->prismic->api_token,
+			'api_endpoint' => $this->prismic->api_endpoint . '/v2',
+			'api_token' => $this->prismic->api_token,
 		];
 		wp_localize_script( $this->plugin_name, 'dac_vars', $js_vars );
 	}

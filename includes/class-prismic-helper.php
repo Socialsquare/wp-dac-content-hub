@@ -123,8 +123,8 @@ class Prismic_Helper {
 				}
 			}
 		}
-
-		return $this->api->query( $query );
+		$api = $this->get_api();
+		return $api->query( $query );
 	}
 
 }
