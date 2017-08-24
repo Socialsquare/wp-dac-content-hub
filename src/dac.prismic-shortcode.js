@@ -38,7 +38,6 @@ import Api from './PrismicHelper';
 					// Click handler for result.
 					elem.addEventListener('click', (e) => {
 						textbox.value = value;
-						console.dir(textbox);
 						itemList.parentNode.removeChild(itemList);
 						// Set to tinyMce paramaters.
 						const params = editor.windowManager.getParams();
