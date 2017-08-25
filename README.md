@@ -11,3 +11,9 @@ Plugin for displaying content provided by DAC content hub.
 5. Enter api endpoint and token (can be found in your prismic settings).
 6. Edit a page and press the DAC button to create a short code.
 7. Enjoy!
+
+## Development
+Have composer, yarn and/or npm.
+1. Run `Composer instal`
+2. Run `Yarn install`
+3. Run `Yarn start` or `Yarn build`
