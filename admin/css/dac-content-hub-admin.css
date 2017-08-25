@@ -12,12 +12,15 @@ ul.dac-autocomplete--list {
 	z-index: 100;
 }
 
-ul.dac-autocomplete--list > li {
+ul.dac-autocomplete--list > li a {
+	color: inherit;
+	display: block;
 	margin: -4px;
 	padding: 4px;
+	text-decoration: none;
 }
 
-ul.dac-autocomplete--list > li:hover,
-ul.dac-autocomplete--list > li:focus {
+ul.dac-autocomplete--list > li a:hover,
+ul.dac-autocomplete--list > li a:focus {
 	background-color: #ececec;
 }
