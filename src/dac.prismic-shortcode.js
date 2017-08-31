@@ -77,10 +77,11 @@ import throttle from 'lodash.throttle';
 						let a = document.createElement('a');
 						a.setAttribute('data-uid', uid);
 						a.setAttribute('href', '#');
-						a.setAttribute('tabindex', 0);
+						a.setAttribute('tabindex', -1);
 						const value = result[uid];
 						const text = document.createTextNode(value);
 						a.appendChild(text);
+
 						// Click handler.
 						a.addEventListener('click', (e) => {
 							e.preventDefault();
@@ -98,7 +99,7 @@ import throttle from 'lodash.throttle';
 								case 13:
 								case 32:
 									textbox.value = value;
-									itemList.parentNode.removeChild(itemList);
+									itemList.innerHTML = "";
 									isOpen = false;
 									const params = editor.windowManager.getParams();
 									params[name] = e.target.dataset.uid;
@@ -108,7 +109,7 @@ import throttle from 'lodash.throttle';
 								case 27:
 									e.preventDefault();
 									isOpen = false;
-									itemList.parentNode.removeChild(itemList);
+									itemList.innerHTML = "";
 									textbox.focus();
 									break;
 							}
@@ -121,6 +122,14 @@ import throttle from 'lodash.throttle';
 				}
 			});
 		}, 1000));
+
+		// Clear list.
+		e.target.addEventListener('blur', (e) => {
+			if (!isOpen) {
+				itemList.innerHTML = "";
+			}
+			//
+		});
 
 		// Attach key navigation.
 		window.addEventListener('keydown', (e) => {
@@ -135,25 +144,42 @@ import throttle from 'lodash.throttle';
 	 * @param {object} element The input dom node to attach the list on.
 	 */
 	const listKeyNav = (list, input, e) => {
+		// Abort if no children.
+		if (list.childElementCount <= 0) {
+			return;
+		}
+
 		const first = list.firstChild;
 		const last = list.lastChild;
+		const activeElement = e.target;
+
 		switch (e.keyCode) {
-			// Up key.
-			case 38:
-				if (document.activeElement === input || first.firstChild) {
-					last.firstChild.focus();
-				}
-				else if (document.activeElement.tagName === 'A' && document.activeElement.parentNode.previousSibling) {
-					document.activeElement.parentNode.previousSibling.firstChild.focus();
-				}
-				break;
-				// Down key.
+			// Down key.
 			case 40:
-				if (document.activeElement === input || last.firstChild) {
+				e.preventDefault();
+				e.stopPropagation();
+				if ((input === activeElement) || (last.firstChild === activeElement)) {
 					first.firstChild.focus();
 				}
-				else if (document.activeElement.tagName === 'A' && document.activeElement.parentElement.nextSibling) {
-					document.activeElement.parentElement.nextSibling.firstChild.focus();
+				else if (('A' === activeElement.tagName) && (null !== activeElement.parentNode.nextSibling)) {
+					activeElement.parentNode.nextSibling.firstChild.focus();
+				}
+				else {
+					return;
+				}
+				break;
+			// Up key.
+			case 38:
+				e.preventDefault();
+				e.stopPropagation();
+				if ((input === activeElement) || (first.firstChild === activeElement)) {
+					last.firstChild.focus();
+				}
+				else if (('A' === activeElement.tagName) && (null !== activeElement.parentNode.previousSibling)) {
+					activeElement.parentNode.previousSibling.firstChild.focus();
+				}
+				else {
+					return;
 				}
 				break;
 		}
@@ -234,7 +260,7 @@ import throttle from 'lodash.throttle';
 							// We need to pass the editor object.
 							dacAutocomplete(e, editor);
 						}
-						elem.addEventListener('focus', focusHandler);
+						elem.addEventListener('focus', focusHandler, {once: true});
 					}
 				}
 			});
