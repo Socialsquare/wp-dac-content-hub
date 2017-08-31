@@ -13,7 +13,8 @@ export default class {
 	 * @param {string} path
 	 * @param {string} value
 	 */
-	fullTextQuery(path, value) {
+	fullTextQuery(options, value) {
+		const path = options.query;
 		if (value.length > 2) {
 			// Call API.
 			return Prismic.api(`${this.settings.api_endpoint}`, {accessToken: this.settings.api_token}).then(api => {

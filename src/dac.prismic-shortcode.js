@@ -1,4 +1,6 @@
 import Api from './PrismicHelper';
+import throttle from 'lodash.throttle';
+
 (() => {
 	// Get settings.
 	const settings = window.dac_vars || null ;
@@ -13,84 +15,116 @@ import Api from './PrismicHelper';
 	/**
 	 * Autocomplete handler.
 	 *
-	 * @param {string} name Form element name.
-	 * @param {string} query Api query string.
-	 * @param {object} editor The editor instance.
-	 * @param {object} e Caught eventt.
+	 * @param {objec} e Event.
 	 */
 	let isOpen = false;
-	const dac_autocomplete = (name, query, editor, e) => {
-		console.log(e.target);
-		// Mute space and enter.
-		if ([13, 32].indexOf(e.keyCode) >= 0) {
-			return;
-		}
-		// List to populate with results.
+	const dacAutocomplete = (e, editor) => {
 		const itemList = document.createElement('ul');
 		// Our target textfield.
 		const textbox = e.target;
-		textbox.setAttribute('autocomplete', false);
-		// Our result promise.
-		const result = api.fullTextQuery(query, textbox.value);
-		Promise.resolve(result).then(result => {
-			if (result && !isOpen) {
-				// Attach result list.
-				itemList.classList.add('dac-autocomplete--list');
-				// Add calculated styles.
-				itemList.style.left = textbox.style.left;
-				itemList.style.top = textbox.style.height;
-				itemList.style.width = textbox.style.width;
-				textbox.parentNode.appendChild(itemList);
-				isOpen = true;
-				// Format results.
-				for (let uid in result) {
-					// Create list item.
-					let li = document.createElement('li');
-					let a = document.createElement('a');
-					a.setAttribute('data-uid', uid);
-					a.setAttribute('href', '#');
-					a.setAttribute('tabindex', 1);
-					const value = result[uid];
-					const text = document.createTextNode(value);
-					a.appendChild(text);
-					// Click handler.
-					a.addEventListener('click', (e) => {
-						e.preventDefault();
-						textbox.value = value;
-						itemList.parentNode.removeChild(itemList);
-						isOpen = false;
-						const params = editor.windowManager.getParams();
-						params[name] = e.target.dataset.uid;
-						editor.windowManager.setParams(params);
-						textbox.focus();
-					});
-					// Keydown handler.
-					a.addEventListener('keyup', (e) => {
-						switch (e.keyCode) {
-							case 13:
-							case 32:
-								textbox.value = value;
-								itemList.parentNode.removeChild(itemList);
-								isOpen = false;
-								const params = editor.windowManager.getParams();
-								params[name] = e.target.dataset.uid;
-								editor.windowManager.setParams(params);
-								textbox.focus();
-								break;
-							case 27:
-								itemList.parentNode.removeChild(itemList);
-								textbox.focus();
-								break;
-						}
-					});
-
-					// Append items.
-					li.appendChild(a);
-					itemList.appendChild(li);
-					// Attach ket navigation.
-					listKeyNav(itemList, textbox);
-				}
+		// Add throttled key event.
+		textbox.addEventListener('keypress', throttle((e) => {
+			// Mute some keys.
+			if ([9, 13, 32].indexOf(e.keyCode) >= 0) {
+				return;
 			}
+			// Do not continute if input is less than 2 characters.
+			if (textbox.value.length < 2) {
+				return;
+			}
+			// Get type and query.
+			let options = {};
+			if (textbox.parentNode.classList.contains('mce-dac-input--area')) {
+				options.name = 'case_area';
+				options.type = 'case_area';
+				options.query = 'my.case_area.area_name'
+			}
+			if (textbox.parentNode.classList.contains('mce-dac-input--organisation')) {
+				options.name = 'organisation';
+				options.type = 'organisation';
+				options.query = 'my.organisation.name';
+			}
+			if (textbox.parentNode.classList.contains('mce-dac-input--category')) {
+				options.name = 'case_category';
+				options.type = 'case-category';
+				options.query = 'my.case-category.name';
+			}
+			if (Object.keys(settings).length <= 0) {
+				return;
+			}
+			// Get name .
+			const name = options.name;
+			// Loader.
+			textbox.classList.add('loading');
+
+			// Our result promise.
+			const result = api.fullTextQuery(options, textbox.value);
+			Promise.resolve(result).then(result => {
+				textbox.classList.remove('loading');
+				if (result && !isOpen) {
+					isOpen = true;
+					// Attach result list.
+					itemList.classList.add('dac-autocomplete--list');
+					// Add calculated styles.
+					itemList.style.left = textbox.style.left;
+					itemList.style.top = textbox.style.height;
+					itemList.style.width = textbox.style.width;
+					textbox.parentNode.appendChild(itemList);
+					// Format results.
+					for (let uid in result) {
+						// Create list item.
+						let li = document.createElement('li');
+						let a = document.createElement('a');
+						a.setAttribute('data-uid', uid);
+						a.setAttribute('href', '#');
+						a.setAttribute('tabindex', 0);
+						const value = result[uid];
+						const text = document.createTextNode(value);
+						a.appendChild(text);
+						// Click handler.
+						a.addEventListener('click', (e) => {
+							e.preventDefault();
+							textbox.value = value;
+							itemList.parentNode.removeChild(itemList);
+							isOpen = false;
+							const params = editor.windowManager.getParams();
+							params[name] = e.target.dataset.uid;
+							editor.windowManager.setParams(params);
+							textbox.focus();
+						});
+						// Keydown handler.
+						a.addEventListener('keyup', (e) => {
+							switch (e.keyCode) {
+								case 13:
+								case 32:
+									textbox.value = value;
+									itemList.parentNode.removeChild(itemList);
+									isOpen = false;
+									const params = editor.windowManager.getParams();
+									params[name] = e.target.dataset.uid;
+									editor.windowManager.setParams(params);
+									textbox.focus();
+									break;
+								case 27:
+									e.preventDefault();
+									isOpen = false;
+									itemList.parentNode.removeChild(itemList);
+									textbox.focus();
+									break;
+							}
+						});
+
+						// Append items.
+						li.appendChild(a);
+						itemList.appendChild(li);
+					}
+				}
+			});
+		}, 1000));
+
+		// Attach key navigation.
+		window.addEventListener('keydown', (e) => {
+			listKeyNav(itemList, textbox, e);
 		});
 	}
 
@@ -100,31 +134,29 @@ import Api from './PrismicHelper';
 	 * @param {object} list The list dom node.
 	 * @param {object} element The input dom node to attach the list on.
 	 */
-	const listKeyNav = (list, input) => {
+	const listKeyNav = (list, input, e) => {
 		const first = list.firstChild;
 		const last = list.lastChild;
-		window.addEventListener('keyup', (e) => {
-			switch (e.keyCode) {
-				// Up key.
-				case 38:
-					if (document.activeElement === input || first.firstChild) {
-						last.firstChild.focus();
-					}
-					else if (document.activeElement.parentElement.previousSibling) {
-						document.activeElement.parentElement.previousSibling.focus();
-					}
-					break;
-					// Down key.
-				case 40:
-					if (document.activeElement === input || last.firstChild) {
-						first.firstChild.focus();
-					}
-					else if (document.activeElement.parentElement.nextSibling) {
-						document.activeElement.parentElement.nextSibling.focus();
-					}
-					break;
-			}
-		});
+		switch (e.keyCode) {
+			// Up key.
+			case 38:
+				if (document.activeElement === input || first.firstChild) {
+					last.firstChild.focus();
+				}
+				else if (document.activeElement.tagName === 'A' && document.activeElement.parentNode.previousSibling) {
+					document.activeElement.parentNode.previousSibling.firstChild.focus();
+				}
+				break;
+				// Down key.
+			case 40:
+				if (document.activeElement === input || last.firstChild) {
+					first.firstChild.focus();
+				}
+				else if (document.activeElement.tagName === 'A' && document.activeElement.parentElement.nextSibling) {
+					document.activeElement.parentElement.nextSibling.firstChild.focus();
+				}
+				break;
+		}
 	}
 
 	// Create buttons.
@@ -139,48 +171,44 @@ import Api from './PrismicHelper';
 					// Open dialog with filter fields.
 					editor.windowManager.open({
 						title: 'Content hub',
+						type: 'container',
+						layout: 'flex',
 						body: [
 							{
-								type: 'textbox',
+								type: 'combobox',
 								name: 'uid',
-								label: 'UID',
+								placeholder: 'UID',
+								classes: 'dac-input dac-input--uid'
 							},
 							{
-								type: 'textbox',
+								type: 'combobox',
 								name: 'case_area',
-								label: 'Area',
-								onkeyup: (e) => {
-									// Autocomplete handler.
-									dac_autocomplete('case_area', 'my.case_area.area_name', editor, e);
-								}
+								placeholder: 'Area',
+								classes: 'dac-input dac-input--area dac-autocomplete'
 							},
 							{
-								type: 'textbox',
+								type: 'combobox',
 								name: 'organisation',
-								label: 'Organisation',
-								onkeyup: (e) => {
-									// Autocomplete handler.
-									dac_autocomplete('organisation', 'my.organisation.name', editor, e);
-								}
+								placeholder: 'Organisation',
+								classes: 'dac-input dac-input--organisation dac-autocomplete'
 							},
 							{
-								type: 'textbox',
+								type: 'combobox',
 								name: 'case_category',
-								label: 'Category',
-								onkeyup: (e) => {
-									// Autocomplete handler.
-									dac_autocomplete('case_category', 'my.case-category.name', editor, e);
-								}
+								placeholder: 'Category',
+								classes: 'dac-input dac-input--category dac-autocomplete'
 							},
 							{
-								type: 'textbox',
+								type: 'combobox',
 								name: 'build_year',
-								label: 'Build year',
+								placeholder: 'Build year',
+								classes: 'dac-input dac-input-year'
 							},
 							{
-								type: 'textbox',
+								type: 'combobox',
 								name: 'tags',
-								label: 'Tags',
+								placeholder: 'Tags',
+								classes: 'dac-input dac-input--tags'
 							}
 						],
 						// Submit handler.
@@ -194,11 +222,20 @@ import Api from './PrismicHelper';
 								}
 							}
 							// Build short code and insert.
-							var shortLink = `[content-hub ${attributes.join(' ')}]`;
-							editor.insertContent(shortLink);
+							var shortCode = `[content-hub ${attributes.join(' ')}]`;
+							editor.insertContent(shortCode);
 							editor.windowManager.close();
 						}
 					});
+
+					// Add event listeners on autocomplete elements.
+					for (let elem of document.querySelectorAll('.mce-dac-autocomplete input')) {
+						const focusHandler = (e) => {
+							// We need to pass the editor object.
+							dacAutocomplete(e, editor);
+						}
+						elem.addEventListener('focus', focusHandler);
+					}
 				}
 			});
 		},

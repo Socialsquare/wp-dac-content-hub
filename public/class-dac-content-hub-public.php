@@ -255,26 +255,26 @@ class Dac_Content_Hub_Public {
 		$context = [];
 		switch ( $type ) {
 			case 'case':
-			// Teaser template file.
-			$template = 'case--teaser.html.twig';
-			// Content.
-			$images = $doc->getGroup( 'case.pictures' )->getArray();
-			$image_attributes = array_map(function ( $image ) {
-				return [
-					'src' => $image->getImage( 'picture' )->getUrl(),
-					'alt' => $image->getImage( 'picture' )->getAlt(),
-					'width' => $image->getImage( 'picture' )->getWidth(),
-					'height' => $image->getImage( 'picture' )->getHeight(),
+				// Teaser template file.
+				$template = 'case--teaser.html.twig';
+				// Content.
+				$images = $doc->getGroup( 'case.pictures' )->getArray();
+				$image_attributes = array_map(function ( $image ) {
+					return [
+						'src' => $image->getImage( 'picture' )->getUrl(),
+						'alt' => $image->getImage( 'picture' )->getAlt(),
+						'width' => $image->getImage( 'picture' )->getWidth(),
+						'height' => $image->getImage( 'picture' )->getHeight(),
+					];
+				}, $images);
+				$image_attributes_first = array_shift( $image_attributes );
+				$context = [
+					'title' => $doc->getText( 'case.title' ),
+					'image' => $image_attributes_first,
+					'teaser_text' => $doc->getStructuredText( 'case.short-description' )->asHtml( $resolver ),
+					'href' => $href,
 				];
-			}, $images);
-			$image_attributes_first = array_shift( $image_attributes );
-			$context = [
-				'title' => $doc->getText( 'case.title' ),
-				'image' => $image_attributes_first,
-				'teaser_text' => $doc->getStructuredText( 'case.short-description' )->asHtml( $resolver ),
-				'href' => $href,
-			];
-			break;
+				break;
 		}
 		if ( ! empty( $template ) && ! empty( $context ) ) {
 			return $twig->render( $template, $context );

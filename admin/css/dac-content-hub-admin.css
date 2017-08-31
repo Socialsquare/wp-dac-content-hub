@@ -24,3 +24,13 @@ ul.dac-autocomplete--list > li a:hover,
 ul.dac-autocomplete--list > li a:focus {
 	background-color: #ececec;
 }
+
+.mce-dac-autocomplete input {
+	transition: none;
+}
+.mce-dac-autocomplete input.loading {
+	background-image: url(../img/loader.svg);
+	background-repeat: no-repeat;
+	background-position: 95% center;
+	background-size: 20px;
+}
