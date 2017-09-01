@@ -21,34 +21,41 @@ class Prismic_Helper {
 	public $link_resolver;
 
 	/**
-	 * Prismic API helper.
+	 * Prismic API endpoint.
 	 *
-	 * @var API $api
+	 * @var string $api_endpoint
 	 */
-	private $api;
+	public $api_endpoint;
+
+	/**
+	 * Prismic API endpoint.
+	 *
+	 * @var string $api_token
+	 */
+	public $api_token;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->link_resolver = new PrismicLinkResolver( $this );
-
-		// $url = $container->get('settings')['prismic.url'];
-		// $token = $container->get('settings')['prismic.token'];
-		$url = 'https://dac-content-hub.cdn.prismic.io/api';
-		$token = null;
-		try {
-			$this->api = Api::get( $url, $token );
-		} catch ( Exeption $e ) {
-			throw new Error( $e->getMessage() );
-		}
+		// Get settings.
+		$this->api_endpoint = get_option( 'dac_api_endpoint' );
+		$this->api_token = get_option( 'dac_api_token' );
 	}
 
 	/**
 	 * Expose api.
+	 *
+	 * @throws Error Error message.
+	 * @return Api
 	 */
-	public function get_api() {
-		return $this->api;
+	public function get_api() : Api {
+		try {
+			return Api::get( $this->api_endpoint, $this->api_token );
+		} catch ( Exeption $e ) {
+			throw new Error( $e->getMessage() );
+		}
 	}
 
 	/**
@@ -60,7 +67,7 @@ class Prismic_Helper {
 	 *
 	 * @return array List of query predicates.
 	 */
-	private function range_query( $type, $name, $value ) {
+	private function range_query( string $type, string $name, string $value ) : array {
 		$numbers = preg_match_all( '/([\d]+)/', $value, $matches )
 		? array_map( 'intval', $matches[1] )
 		: null;
@@ -82,7 +89,7 @@ class Prismic_Helper {
 	 *
 	 * @param array $predicates Query predicates.
 	 */
-	public function query( $predicates ) {
+	public function query( array $predicates ) {
 		$query = [];
 		$type = $predicates['type'] ?: null;
 		foreach ( $predicates as $name => $value ) {
@@ -106,7 +113,7 @@ class Prismic_Helper {
 						break;
 
 					case 'tags':
-						$tags = explode(' ', $value );
+						$tags = explode( ' ', $value );
 						$query[] = Predicates::any( "document.$name", $tags );
 						break;
 
@@ -116,8 +123,8 @@ class Prismic_Helper {
 				}
 			}
 		}
-
-		return $this->api->query( $query );
+		$api = $this->get_api();
+		return $api->query( $query );
 	}
 
 }

@@ -2,3 +2,35 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+ul.dac-autocomplete--list {
+	background-color: rgba(255, 255, 255, 0.8);
+	border: 1px solid #ececec;
+	margin: 0 !important;
+	padding: 4px;
+	position: absolute;
+	z-index: 100;
+}
+
+ul.dac-autocomplete--list > li a {
+	color: inherit;
+	display: block;
+	margin: -4px;
+	padding: 4px;
+	text-decoration: none;
+}
+
+ul.dac-autocomplete--list > li a:hover,
+ul.dac-autocomplete--list > li a:focus {
+	background-color: #ececec;
+}
+
+.mce-dac-autocomplete input {
+	transition: none;
+}
+.mce-dac-autocomplete input.loading {
+	background-image: url(../img/loader.svg);
+	background-repeat: no-repeat;
+	background-position: 95% center;
+	background-size: 20px;
+}
