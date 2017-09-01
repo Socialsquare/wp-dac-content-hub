@@ -56,7 +56,7 @@ class Dac_Content_Hub_Admin {
 	 * @param string $plugin_name The name of this plugin.
 	 * @param string $version The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( string $plugin_name, string $version ) {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		// Init prismic.
@@ -117,11 +117,11 @@ class Dac_Content_Hub_Admin {
 	/**
 	 * Register new button.
 	 *
-	 * @param array $button Array of previous buttons.
+	 * @param array $buttons Array of previous buttons.
 	 *
 	 * @return array $buttons
 	 */
-	public function dac_register_shortcode_button( $buttons ) {
+	public function dac_register_shortcode_button( array $buttons ) : array {
 		array_push( $buttons, '|', 'dac_content_hub' );
 		return $buttons;
 	}
@@ -133,7 +133,7 @@ class Dac_Content_Hub_Admin {
 	 *
 	 * @return array $plugin_array
 	 */
-	public function dac_add_shortcode_button( $plugin_array ) {
+	public function dac_add_shortcode_button( array $plugin_array ) : array {
 		$plugin_array['dac_shortcode'] = plugins_url( '/js/dac.prismic-shortcode.js', __FILE__ );
 		return $plugin_array;
 	}

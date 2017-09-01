@@ -14,6 +14,6 @@ Plugin for displaying content provided by DAC content hub.
 
 ## Development
 Have composer, yarn and/or npm.
-1. Run `Composer instal`
-2. Run `Yarn install`
-3. Run `Yarn start` or `Yarn build`
+1. Run `composer install`
+2. Run `yarn install`
+3. Run `yarn start` or `yarn build`

@@ -50,7 +50,7 @@ class Prismic_Helper {
 	 * @throws Error Error message.
 	 * @return Api
 	 */
-	public function get_api() {
+	public function get_api() : Api {
 		try {
 			return Api::get( $this->api_endpoint, $this->api_token );
 		} catch ( Exeption $e ) {
@@ -67,7 +67,7 @@ class Prismic_Helper {
 	 *
 	 * @return array List of query predicates.
 	 */
-	private function range_query( $type, $name, $value ) {
+	private function range_query( string $type, string $name, string $value ) : array {
 		$numbers = preg_match_all( '/([\d]+)/', $value, $matches )
 		? array_map( 'intval', $matches[1] )
 		: null;
@@ -89,7 +89,7 @@ class Prismic_Helper {
 	 *
 	 * @param array $predicates Query predicates.
 	 */
-	public function query( $predicates ) {
+	public function query( array $predicates ) {
 		$query = [];
 		$type = $predicates['type'] ?: null;
 		foreach ( $predicates as $name => $value ) {

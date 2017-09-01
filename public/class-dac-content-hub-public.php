@@ -62,7 +62,7 @@ class Dac_Content_Hub_Public {
 	 * @param string $plugin_name The name of the plugin.
 	 * @param string $version The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( string $plugin_name, string $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
@@ -122,7 +122,7 @@ class Dac_Content_Hub_Public {
 	 *
 	 * @return array $vars
 	 */
-	public function add_query_vars( $vars ) {
+	public function add_query_vars( array $vars ) : array {
 		$vars[] = 'content_type';
 		$vars[] = 'content_uid';
 		return $vars;
@@ -171,10 +171,10 @@ class Dac_Content_Hub_Public {
 	/**
 	 * Thumbnail output.
 	 */
-	public function post_thumbnail_html($html, $post_id, $post_thumbnail_id, $size, $attr) {
+	public function post_thumbnail_html( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
 		$post = get_post();
-		if($post->post_type === 'case') {
-			$pictures = $post->content->getGroup('case.pictures')->getArray();
+		if ( 'case' === $post->post_type ) {
+			$pictures = $post->content->getGroup( 'case.pictures' )->getArray();
 		}
 	}
 
@@ -239,9 +239,9 @@ class Dac_Content_Hub_Public {
 	/**
 	 * Twig powered data formatter.
 	 *
-	 * @param object $doc Prismic document.
+	 * @param Prismic\Document $doc Prismic document.
 	 */
-	public function dac_format_data( $doc ) {
+	public function dac_format_data( Prismic\Document $doc ) {
 		$type = $doc->getType();
 		// Use twig for templating.
 		$loader = new Twig_Loader_Filesystem( plugin_dir_path( __FILE__ ) . 'templates' );
@@ -293,7 +293,7 @@ class Dac_Content_Hub_Public {
 	 *
 	 * @param array $attributes Shortcode attributes.
 	 */
-	public function dac_shortcode( $attributes = [] ) {
+	public function dac_shortcode( array $attributes = [] ) {
 		$attributes = shortcode_atts(
 			[
 				// Default to case only.
